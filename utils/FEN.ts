@@ -32,6 +32,43 @@ function can_be_en_passant(position: Position, team: Team, en_passanting: string
 }
 
 /**
+ * Creates a Piece class for the given cell.
+ * 
+ * Returns with the Piece.
+ */
+function create_piece(cell: string | null, x: number, y: number, castling: string, en_passanting: string) {
+    if (cell && !cell.match(/[1-8]/)) {
+        // Cell represents a piece
+        let team: Team = cell!.toUpperCase() === cell ? 'White' : 'Black'
+        let position = `${Col[7-x]}${y+1}` as Position
+
+        if (cell!.match(/k/i)) {
+            // Cell represents a king
+            return new Piece('King', team, position)
+        } else if (cell!.match(/q/i)) {
+            // Cell represents a queen
+            return new Piece('Queen', team, position)
+        } else if (cell!.match(/b/i)) {
+            // Cell represents a bishop
+            return new Piece('Bishop', team, position)
+        } else if (cell!.match(/n/i)) {
+            // Cell represents a knight
+            return new Piece('Knight', team, position)
+        } else if (cell!.match(/r/i)) {
+            // Cell represents a rook
+            return new Piece('Rook', team, position, {
+                can_castle: can_castle(position, castling)
+            })
+        } else if (cell!.match(/p/i)) {
+            // Cell represents a pawn
+            return new Piece('Pawn', team, position, {
+                can_be_en_passant: can_be_en_passant(position, team, en_passanting)
+            })
+        }
+    }
+}
+
+/**
  * Read a FEN string.
  * 
  * Returns with a BoardState for the given FEN.
@@ -42,53 +79,21 @@ export function read_fen(fen: string): FENData {
     let castling = properties[2]
     let en_passanting = properties[3]
 
-    // Create the board state with Pieces
-    let state = cells.map((row, x) => row.map((cell, y, a) => {
-        if (cell!.match(/[1-8]/)) {
-            // Cell represents a number of empty cells
+    // Replace numbers with nulls
+    cells.forEach((row, x) => row.forEach((cell, y, a) => {
+        if (cell && cell.match(/[1-8]/)) {
             a.splice(y, 1, ...Array.from(Array(Number(cell)).keys(), () => null))
-            return null
-        } else {
-            // Cell represents a piece
-            let team: Team = cell!.toUpperCase() === cell ? 'White' : 'Black'
-            let position = `${Col[7-x]}${y+1}` as Position
-
-            if (cell!.match(/k/i)) {
-                // Cell represents a king
-                return new Piece('King', team, position)
-            } else if (cell!.match(/q/i)) {
-                // Cell represents a queen
-                return new Piece('Queen', team, position)
-            } else if (cell!.match(/b/i)) {
-                // Cell represents a bishop
-                return new Piece('Bishop', team, position)
-            } else if (cell!.match(/n/i)) {
-                // Cell represents a knight
-                return new Piece('Knight', team, position)
-            } else if (cell!.match(/r/i)) {
-                // Cell represents a rook
-                return new Piece('Rook', team, position, {
-                    can_castle: can_castle(position, castling)
-                })
-            } else if (cell!.match(/p/i)) {
-                // Cell represents a pawn
-                return new Piece('Pawn', team, position, {
-                    can_be_en_passant: can_be_en_passant(position, team, en_passanting)
-                })
-            }
         }
-
-        throw 'There was an error reading the FEN'
     }))
 
-    // Get all pieces from the state
+    // Add pieces to array
     let pieces: Piece[] = []
-    for (let i = 0; i < state.length; i++) {
-        for (let j = 0; j < state[i].length; j++) {
-            if (state[i][j]) pieces.push(state[i][j]!)
-        }
-    }
+    cells.forEach((row, x) => row.forEach((cell, y, a) => {
+        let piece = create_piece(cell, x, y, castling, en_passanting)
+        if (piece) pieces.push(piece)
+    }))
 
+    // Return with necessary data
     return {
         pieces,
         active: (properties[1] === 'w' ? 'White' : 'Black') as Team,
