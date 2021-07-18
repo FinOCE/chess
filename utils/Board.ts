@@ -1,13 +1,46 @@
-import Piece from './Piece'
+import Piece, {Team} from './Piece'
+import {read_fen} from './FEN'
 
+export type RowPosition = '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8'
+export type ColPosition = 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h'
+export enum Col {
+    'a' = 0,
+    'b' = 1,
+    'c' = 2,
+    'd' = 3,
+    'e' = 4,
+    'f' = 5,
+    'g' = 6,
+    'h' = 7
+}
+
+export type Position = `${ColPosition}${RowPosition}`
 export type BoardState = Array<Piece | null>[]
 
 export default class Board {
     public state: BoardState
+    public active: Team
+    public half_moves_counter: number
+    public moves: number
 
     constructor() {
         this.state = []
+        this.active = 'White'
+        this.half_moves_counter = 0
+        this.moves = 0
+
         this.create()
+    }
+
+    /**
+     * Set the board for a new game.
+     */
+     public create(): void {
+        let data = read_fen('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1')
+        this.state = data.state
+        this.active = data.active
+        this.half_moves_counter = data.half_move_counter
+        this.moves = data.moves
     }
 
     /**
@@ -16,11 +49,6 @@ export default class Board {
     public clear_board(): void {
         this.state = Array.from(Array(8), () => Array(8))
     }
-
-    /**
-     * Set the board for a new game.
-     */
-    public create(): void {}
 
     /**
      * Remove a piece.
@@ -36,6 +64,7 @@ export default class Board {
      */
     public place_piece(row: number, column: number, piece: Piece): Piece | null {
         let piece_replaced = this.state[row][column]
+        piece.set_position(row, column)
         this.state[row][column] = piece
         return piece_replaced
     }
