@@ -1,9 +1,10 @@
-import Board from '../utils/Board'
+import Board from '../components/board'
+import styles from '../styles/index.module.sass'
 
-export default function Page() {
-    let board = new Board()
-
+export default function index() {
     return (
-        <pre><code>{JSON.stringify(board, null, 4)}</code></pre>
+        <div id={styles.index}>
+            <Board />
+        </div>
     )
 }
