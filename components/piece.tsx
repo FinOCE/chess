@@ -6,7 +6,7 @@ import styles from '../styles/piece.module.sass'
 
 export interface PieceProps {
     data: Piece
-    style: Properties<string | number, string & {}>
+    style?: Properties<string | number, string & {}>
 }
 
 export default function piece(props: PieceProps) {
@@ -24,7 +24,7 @@ export default function piece(props: PieceProps) {
     }
 
     return (
-        <div className={styles.piece} style={Object.assign(props.style, {color: colors[props.data.team]})}>
+        <div className={styles.piece} style={Object.assign({color: colors[props.data.team]}, props.style)}>
             <FontAwesomeIcon icon={types[props.data.type]} />
         </div>
     )
