@@ -15,8 +15,8 @@ export interface FENData {
  */
 function can_castle(position: Position, castling: string): boolean {
     if (position === 'a1' && castling.indexOf('Q')) return true
-    if (position === 'h1' && castling.indexOf('K')) return true
-    if (position === 'a8' && castling.indexOf('q')) return true
+    if (position === 'a8' && castling.indexOf('K')) return true
+    if (position === 'h1' && castling.indexOf('q')) return true
     if (position === 'h8' && castling.indexOf('k')) return true
     return false
 }
@@ -42,15 +42,15 @@ export function read_fen(fen: string): FENData {
     let castling = properties[2]
     let en_passanting = properties[3]
 
-    cells.map((row, x) => row.map((cell, y, a) => {
+    let state: BoardState = cells.map((row, x) => row.map((cell, y, a) => {
         if (cell!.match(/[1-8]/)) {
             // Cell represents a number of empty cells
-            a.splice(y, 0, ...Array.from(Array(Number(cell)-1).keys(), () => null))
+            a.splice(y, 1, ...Array.from(Array(Number(cell)).keys(), () => null))
             return null
         } else {
             // Cell represents a piece
             let team: Team = cell!.toUpperCase() === cell ? 'White' : 'Black'
-            let position = `${Col[8-y]}${x+1}` as Position
+            let position = `${Col[7-x]}${y+1}` as Position
 
             if (cell!.match(/k/i)) {
                 // Cell represents a king
@@ -81,7 +81,7 @@ export function read_fen(fen: string): FENData {
     }))
 
     return {
-        state: cells as BoardState,
+        state,
         active: (properties[1] === 'w' ? 'White' : 'Black') as Team,
         half_move_counter: Number(properties[4]),
         moves: Number(properties[5])

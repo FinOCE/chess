@@ -29,6 +29,6 @@ export default class Piece {
     }
 
     public set_position(row: number, column: number): void {
-        this.position = `${Col[8-column]}${row+1}` as Position
+        this.position = `${Col[7-column]}${row+1}` as Position
     }
 }
