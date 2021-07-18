@@ -28,7 +28,7 @@ export default class Piece {
         if (this.type === 'Pawn') this.can_be_en_passant = (data as PawnData).can_be_en_passant
     }
 
-    public set_position(row: number, column: number): void {
-        this.position = `${Col[7-column]}${row+1}` as Position
+    public set_position(position: Position): void {
+        this.position = position
     }
 }

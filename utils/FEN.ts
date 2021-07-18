@@ -1,8 +1,8 @@
-import {BoardState, Col, Position} from './Board'
+import {Col, Position} from './Board'
 import Piece, {Team} from './Piece'
 
 export interface FENData {
-    state: BoardState
+    pieces: Piece[]
     active: Team
     half_move_counter: number
     moves: number
@@ -42,7 +42,8 @@ export function read_fen(fen: string): FENData {
     let castling = properties[2]
     let en_passanting = properties[3]
 
-    let state: BoardState = cells.map((row, x) => row.map((cell, y, a) => {
+    // Create the board state with Pieces
+    let state = cells.map((row, x) => row.map((cell, y, a) => {
         if (cell!.match(/[1-8]/)) {
             // Cell represents a number of empty cells
             a.splice(y, 1, ...Array.from(Array(Number(cell)).keys(), () => null))
@@ -80,8 +81,16 @@ export function read_fen(fen: string): FENData {
         throw 'There was an error reading the FEN'
     }))
 
+    // Get all pieces from the state
+    let pieces: Piece[] = []
+    for (let i = 0; i < state.length; i++) {
+        for (let j = 0; j < state[i].length; j++) {
+            if (state[i][j]) pieces.push(state[i][j]!)
+        }
+    }
+
     return {
-        state,
+        pieces,
         active: (properties[1] === 'w' ? 'White' : 'Black') as Team,
         half_move_counter: Number(properties[4]),
         moves: Number(properties[5])

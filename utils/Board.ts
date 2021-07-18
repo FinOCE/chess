@@ -15,16 +15,15 @@ export enum Col {
 }
 
 export type Position = `${ColPosition}${RowPosition}`
-export type BoardState = Array<Piece | null>[]
 
 export default class Board {
-    public state: BoardState
+    public pieces: Piece[]
     public active: Team
     public half_moves_counter: number
     public moves: number
 
     constructor() {
-        this.state = []
+        this.pieces = []
         this.active = 'White'
         this.half_moves_counter = 0
         this.moves = 0
@@ -37,7 +36,7 @@ export default class Board {
      */
      public create(): void {
         let data = read_fen('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1')
-        this.state = data.state
+        this.pieces = data.pieces
         this.active = data.active
         this.half_moves_counter = data.half_move_counter
         this.moves = data.moves
@@ -47,26 +46,7 @@ export default class Board {
      * Remove all pieces from the board.
      */
     public clear_board(): void {
-        this.state = Array.from(Array(8), () => Array(8))
-    }
-
-    /**
-     * Remove a piece.
-     */
-    public remove_piece(row: number, column: number): void {
-        this.state[row][column] = null
-    }
-
-    /**
-     * Place a piece at the given position.
-     * 
-     * Returns with the replaced piece if something is taken.
-     */
-    public place_piece(row: number, column: number, piece: Piece): Piece | null {
-        let piece_replaced = this.state[row][column]
-        piece.set_position(row, column)
-        this.state[row][column] = piece
-        return piece_replaced
+        this.pieces = []
     }
 
     /**
@@ -74,8 +54,29 @@ export default class Board {
      * 
      * Returns with the piece if it exists.
      */
-    public get_piece(row: number, column: number): Piece | null {
-        return this.state[row][column]
+     public get_piece(position: Position): Piece | null {
+        return this.pieces.find(p => p.position === position) ?? null
+    }
+
+    /**
+     * Remove a piece.
+     */
+    public remove_piece(position: Position): Piece | null {
+        let piece = this.get_piece(position)
+        this.pieces = this.pieces.filter(p => !(p.position === position))
+        return piece
+    }
+
+    /**
+     * Place a piece at the given position.
+     * 
+     * Returns with the replaced piece if something is taken.
+     */
+    public place_piece(position: Position, piece: Piece): Piece | null {
+        let piece_replaced = this.remove_piece(position)
+        piece.set_position(position)
+        this.pieces.push(piece)
+        return piece_replaced
     }
 
     /**
@@ -83,16 +84,14 @@ export default class Board {
      * 
      * Returns with the replaced piece if something is taken.
      */
-    public move_piece([ox, oy]: [number, number], [nx, ny]: [number, number]) {
-        let old_piece = this.get_piece(ox, oy)
-
+    public move_piece(old_position: Position, new_position: Position) {
+        let old_piece = this.get_piece(old_position)
         if (!old_piece) throw 'There is no piece to move!'
 
-        let new_piece = this.get_piece(nx, ny)
-
+        let new_piece = this.get_piece(new_position)
         if (new_piece?.team !== old_piece.team) {
-            this.remove_piece(ox, oy)
-            this.place_piece(nx, ny, old_piece)
+            this.remove_piece(old_position)
+            this.place_piece(new_position, old_piece)
         } else throw 'You cannot take your own piece!'
     }
 }
