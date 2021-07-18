@@ -1,7 +1,9 @@
 import Piece from './Piece'
 
+export type BoardState = Array<Piece | null>[]
+
 export default class Board {
-    public state: Array<Piece | null>[]
+    public state: BoardState
 
     constructor() {
         this.state = []
@@ -23,8 +25,8 @@ export default class Board {
     /**
      * Remove a piece.
      */
-    public remove_piece(column: number, row: number): void {
-        this.state[column][row] = null
+    public remove_piece(row: number, column: number): void {
+        this.state[row][column] = null
     }
 
     /**
@@ -32,9 +34,9 @@ export default class Board {
      * 
      * Returns with the replaced piece if something is taken.
      */
-    public place_piece(column: number, row: number, piece: Piece): Piece | null {
-        let piece_replaced = this.state[column][row]
-        this.state[column][row] = piece
+    public place_piece(row: number, column: number, piece: Piece): Piece | null {
+        let piece_replaced = this.state[row][column]
+        this.state[row][column] = piece
         return piece_replaced
     }
 
@@ -43,8 +45,8 @@ export default class Board {
      * 
      * Returns with the piece if it exists.
      */
-    public get_piece(column: number, row: number): Piece | null {
-        return this.state[column][row]
+    public get_piece(row: number, column: number): Piece | null {
+        return this.state[row][column]
     }
 
     /**
@@ -52,16 +54,16 @@ export default class Board {
      * 
      * Returns with the replaced piece if something is taken.
      */
-    public move_piece([oy, ox]: [number, number], [ny, nx]: [number, number]) {
-        let old_piece = this.get_piece(oy, ox)
+    public move_piece([ox, oy]: [number, number], [nx, ny]: [number, number]) {
+        let old_piece = this.get_piece(ox, oy)
 
         if (!old_piece) throw 'There is no piece to move!'
 
-        let new_piece = this.get_piece(ny, nx)
+        let new_piece = this.get_piece(nx, ny)
 
         if (new_piece?.team !== old_piece.team) {
-            this.remove_piece(oy, ox)
-            this.place_piece(ny, nx, old_piece)
+            this.remove_piece(ox, oy)
+            this.place_piece(nx, ny, old_piece)
         } else throw 'You cannot take your own piece!'
     }
 }
