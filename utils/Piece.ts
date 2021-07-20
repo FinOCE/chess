@@ -16,7 +16,7 @@ export default abstract class Piece {
     public abstract get_legal_moves(state: Array<Piece | null>, i: number): number[]
 
     public is_legal(state: Array<Piece | null>, i: number): boolean {
-        return state[i] === null || state[i]?.team !== this.team 
+        return state[i] === null || state[i]?.team !== this.team
     }
 
     public is_within_bounds(ii: number) {
@@ -24,7 +24,7 @@ export default abstract class Piece {
     }
 
     public goes_over_edge(i: number, ii: number, mm: number): boolean {
-        return [((i+mm) % 8)-1, ((i+mm) % 8), ((i+mm) % 8)+1].indexOf((ii % 8)) === -1
+        return [((i+mm) % 8)-2, ((i+mm) % 8)-1, ((i+mm) % 8), ((i+mm) % 8)+1, ((i+mm) % 8)+2].indexOf((ii % 8)) === -1
     }
 
     public get_all_moves(state: Array<Piece | null>, i: number, m: number) {
@@ -33,7 +33,7 @@ export default abstract class Piece {
         let moves = []
         let search = true
 
-        while (this.is_within_bounds(ii) && this.is_legal(state, ii) && !this.goes_over_edge(i, ii, mm) && search) {
+        while (this.is_within_bounds(ii) && !this.goes_over_edge(i, ii, mm) && this.is_legal(state, ii) && search) {
             if (state[ii]?.type) search = false
             ii += m
             mm += m
@@ -41,5 +41,9 @@ export default abstract class Piece {
         }
 
         return moves
+    }
+
+    public can_capture(state: Array<Piece | null>, i: number, target: number): boolean {
+        return this.get_legal_moves(state, i).indexOf(target) === -1
     }
 }

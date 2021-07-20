@@ -26,4 +26,11 @@ export default class Pawn extends Piece {
             .map(move => i + move)
             .filter(i => (i >= 0 && i < 64 && this.is_legal(state, i)))
     }
+
+    public can_capture(state: Array<Piece | null>, i: number, target: number): boolean {
+        return (this.team === 'White' ? [-7, -9] : [7, 9])
+            .map(move => i + move)
+            .filter(i => (i >= 0 && i < 64 && this.is_legal(state, i)))
+            .indexOf(target) === -1
+    }
 }
