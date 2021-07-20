@@ -16,27 +16,31 @@ export enum Col {
 
 export type Position = `${ColPosition}${RowPosition}`
 
+export function indexToPosition(i: number): Position {
+    return `${Col[i % 8 + 1]}${8 - Math.round(i/8)}` as Position
+}
+
 export default class Board {
-    public pieces: Piece[]
+    public state: Array<Piece | null>
     public active: Team
     public half_moves_counter: number
     public moves: number
 
     constructor() {
-        this.pieces = []
+        this.state = Array(64)
         this.active = 'White'
         this.half_moves_counter = 0
         this.moves = 0
 
-        this.create()
+        this.create_from_fen('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1')
     }
 
     /**
      * Set the board for a new game.
      */
-     public create(): void {
-        let data = read_fen('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1')
-        this.pieces = data.pieces
+     public create_from_fen(fen: string): void {
+        let data = read_fen(fen)
+        this.state = data.state
         this.active = data.active
         this.half_moves_counter = data.half_move_counter
         this.moves = data.moves
@@ -46,7 +50,7 @@ export default class Board {
      * Remove all pieces from the board.
      */
     public clear_board(): void {
-        this.pieces = []
+        this.state = Array(64)
     }
 
     /**
@@ -54,16 +58,16 @@ export default class Board {
      * 
      * Returns with the piece if it exists.
      */
-     public get_piece(position: Position): Piece | null {
-        return this.pieces.find(p => p.position === position) ?? null
+     public get_piece(i: number): Piece | null {
+        return this.state[i]
     }
 
     /**
      * Remove a piece.
      */
-    public remove_piece(position: Position): Piece | null {
-        let piece = this.get_piece(position)
-        this.pieces = this.pieces.filter(p => !(p.position === position))
+    public remove_piece(i: number): Piece | null {
+        let piece = this.get_piece(i)
+        this.state[i] = null
         return piece
     }
 
@@ -72,10 +76,9 @@ export default class Board {
      * 
      * Returns with the replaced piece if something is taken.
      */
-    public place_piece(position: Position, piece: Piece): Piece | null {
-        let piece_replaced = this.remove_piece(position)
-        piece.set_position(position)
-        this.pieces.push(piece)
+    public place_piece(i: number, piece: Piece): Piece | null {
+        let piece_replaced = this.remove_piece(i)
+        this.state[i] = piece
         return piece_replaced
     }
 
@@ -84,14 +87,14 @@ export default class Board {
      * 
      * Returns with the replaced piece if something is taken.
      */
-    public move_piece(old_position: Position, new_position: Position) {
-        let old_piece = this.get_piece(old_position)
+    public move_piece(i: number, ii: number) {
+        let old_piece = this.get_piece(i)
         if (!old_piece) throw 'There is no piece to move!'
 
-        let new_piece = this.get_piece(new_position)
+        let new_piece = this.get_piece(ii)
         if (new_piece?.team !== old_piece.team) {
-            this.remove_piece(old_position)
-            this.place_piece(new_position, old_piece)
+            this.remove_piece(i)
+            this.place_piece(ii, old_piece)
         } else throw 'You cannot take your own piece!'
     }
 }

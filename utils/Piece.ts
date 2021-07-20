@@ -14,21 +14,15 @@ export interface PawnData {
 export default class Piece {
     public type: PieceType
     public team: Team
-    public position: Position
     public can_castle?: boolean
     public can_be_en_passant?: boolean
 
-    constructor(type: PieceType, team: Team, position: Position, data?: RookData | PawnData) {
+    constructor(type: PieceType, team: Team, data?: RookData | PawnData) {
         this.type = type
         this.team = team
-        this.position = position
 
         // Add unique properties to required pieces
         if (this.type === 'Rook') this.can_castle = (data as RookData).can_castle
         if (this.type === 'Pawn') this.can_be_en_passant = (data as PawnData).can_be_en_passant
-    }
-
-    public set_position(position: Position): void {
-        this.position = position
     }
 }
