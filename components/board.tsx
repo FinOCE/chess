@@ -15,13 +15,18 @@ export default function board() {
                 <div
                     key={i}
                     className={styles.checker}
-                    style={{background: selected.indexOf(i) !== -1 ? '#ffffff99' : colors[(i + Math.floor(i/8)) % 2]}}
+                    style={{background: colors[(i + Math.floor(i/8)) % 2]}}
                     onClick={() => {
                         if (!cell) return setSelected([])
-
                         setSelected(cell.get_legal_moves(board.state, i))
                     }}
                 >
+                    {selected.indexOf(i) !== -1 && cell?.team && board.active !== cell?.team && (
+                        <div className={styles.potentialCapture}></div>
+                    )}
+                    {selected.indexOf(i) !== -1 && !cell?.team && (
+                        <div className={styles.potentialMove}></div>
+                    )}
                     {cell && (<span className={styles.icon}>
                         <Piece data={cell} />
                     </span>)}

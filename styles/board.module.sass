@@ -15,6 +15,26 @@
     position: relative
     user-select: none
 
+    .potentialMove
+        content: ''
+        position: absolute
+        top: 40%
+        left: 40%
+        height: 20%
+        width: 20%
+        border-radius: 100%
+        background: #77777777
+    
+    .potentialCapture
+        content: ''
+        position: absolute
+        top: 0
+        left: 0
+        height: calc(100% - 10px)
+        width: calc(100% - 10px)
+        border: 5px solid #77777777
+        border-radius: 100%
+
     .label
         position: absolute
         color: #aaa
