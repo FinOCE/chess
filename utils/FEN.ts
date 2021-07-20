@@ -1,5 +1,12 @@
 import {indexToPosition} from './Board'
+
 import Piece, {Team} from './Piece'
+import Bishop from './pieces/Bishop'
+import King from './pieces/King'
+import Queen from './pieces/Queen'
+import Knight from './pieces/Knight'
+import Rook from './pieces/Rook'
+import Pawn from './pieces/Pawn'
 
 export interface FENData {
     state: Array<Piece | null>
@@ -40,29 +47,17 @@ function create_piece(cell: string | null, i: number, castling: string, en_passa
         // Cell represents a piece
         let team: Team = cell!.toUpperCase() === cell ? 'White' : 'Black'
 
-        if (cell!.match(/k/i)) {
-            // Cell represents a king
-            return new Piece('King', team, i)
-        } else if (cell!.match(/q/i)) {
-            // Cell represents a queen
-            return new Piece('Queen', team, i)
-        } else if (cell!.match(/b/i)) {
-            // Cell represents a bishop
-            return new Piece('Bishop', team, i)
-        } else if (cell!.match(/n/i)) {
-            // Cell represents a knight
-            return new Piece('Knight', team, i)
-        } else if (cell!.match(/r/i)) {
-            // Cell represents a rook
-            return new Piece('Rook', team, i, {
-                can_castle: can_castle(i, castling)
-            })
-        } else if (cell!.match(/p/i)) {
-            // Cell represents a pawn
-            return new Piece('Pawn', team, i, {
-                can_be_en_passant: can_be_en_passant(i, team, en_passanting)
-            })
-        } else throw 'Unknown piece!'
+        if (cell!.match(/k/i)) return new King(team, i)
+        else if (cell!.match(/q/i)) return new Queen(team, i)
+        else if (cell!.match(/b/i)) return new Bishop(team, i)
+        else if (cell!.match(/n/i)) return new Knight(team, i)
+        else if (cell!.match(/r/i)) return new Rook(team, i, {
+            can_castle: can_castle(i, castling)
+        })
+        else if (cell!.match(/p/i)) return new Pawn(team, i, {
+            can_be_en_passant: can_be_en_passant(i, team, en_passanting)
+        })
+        else throw 'Unknown piece!'
     } else return null
 }
 
