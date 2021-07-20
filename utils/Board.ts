@@ -32,13 +32,13 @@ export default class Board {
         this.half_moves_counter = 0
         this.moves = 0
 
-        this.create_from_fen('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1')
+        this.create_from_fen('rnb1kb1r/pppp1ppp/8/4N3/5P1q/3B1Q2/PPPP3P/RNB1K2n w Qkq - 0 8')//'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1')
     }
 
     /**
      * Set the board for a new game.
      */
-     public create_from_fen(fen: string): void {
+    public create_from_fen(fen: string): void {
         let data = read_fen(fen)
         this.state = data.state
         this.active = data.active
@@ -58,14 +58,14 @@ export default class Board {
      * 
      * Returns with the piece if it exists.
      */
-     public get_piece(i: number): Piece | null {
+    private get_piece(i: number): Piece | null {
         return this.state[i]
     }
 
     /**
      * Remove a piece.
      */
-    public remove_piece(i: number): Piece | null {
+    private remove_piece(i: number): Piece | null {
         let piece = this.get_piece(i)
         this.state[i] = null
         return piece
@@ -76,7 +76,7 @@ export default class Board {
      * 
      * Returns with the replaced piece if something is taken.
      */
-    public place_piece(i: number, piece: Piece): Piece | null {
+    private place_piece(i: number, piece: Piece): Piece | null {
         let piece_replaced = this.remove_piece(i)
         this.state[i] = piece
         return piece_replaced

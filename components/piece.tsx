@@ -24,7 +24,13 @@ export default function piece(props: PieceProps) {
     }
 
     return (
-        <div className={styles.piece} style={Object.assign({color: colors[props.data.team]}, props.style)}>
+        <div
+            className={styles.piece}
+            style={Object.assign({
+                color: colors[props.data.team]},
+                props.style
+            )}
+        >
             <FontAwesomeIcon icon={types[props.data.type]} />
         </div>
     )
