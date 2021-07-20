@@ -16,7 +16,10 @@ export default abstract class Piece {
     public abstract get_legal_moves(state: Array<Piece | null>, i: number): number[]
 
     public is_legal(state: Array<Piece | null>, i: number): boolean {
-        return state[i] === null || state[i]?.team !== this.team
+        // Prevent taking own pieces
+        if (state[i]?.team === this.team) return false
+
+        return true
     }
 
     public is_within_bounds(ii: number) {

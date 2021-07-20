@@ -95,6 +95,7 @@ export default class Board {
         if (new_piece?.team !== old_piece.team) {
             this.remove_piece(i)
             this.place_piece(ii, old_piece)
+            this.active = this.active === 'White' ? 'Black' : 'White'
         } else throw 'You cannot take your own piece!'
     }
 }
