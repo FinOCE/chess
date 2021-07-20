@@ -20,6 +20,11 @@ export function indexToPosition(i: number): Position {
     return `${Col[i % 8 + 1]}${8 - Math.round(i/8)}` as Position
 }
 
+export interface FindPieceDifference {
+    only_white: Piece[]
+    only_black: Piece[]
+}
+
 export default class Board {
     public state: Array<Piece | null>
     public active: Team
@@ -32,7 +37,7 @@ export default class Board {
         this.half_moves_counter = 0
         this.moves = 0
 
-        this.create_from_fen('rnb1kb1r/pppp1ppp/8/4N3/5P1q/3B1Q2/PPPP3P/RNB1K2n w Qkq - 0 8')//'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1')
+        this.create_from_fen('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1')
     }
 
     /**
@@ -87,7 +92,7 @@ export default class Board {
      * 
      * Returns with the replaced piece if something is taken.
      */
-    public move_piece(i: number, ii: number) {
+    public move_piece(i: number, ii: number): void {
         let old_piece = this.get_piece(i)
         if (!old_piece) throw 'There is no piece to move!'
 
@@ -97,5 +102,54 @@ export default class Board {
             this.place_piece(ii, old_piece)
             this.active = this.active === 'White' ? 'Black' : 'White'
         } else throw 'You cannot take your own piece!'
+    }
+
+    /**
+     * Get the pieces that each side has the other doesn't.
+     * 
+     * Returns with an object with an array of Pieces for each player.
+     */
+    public find_piece_difference(): FindPieceDifference {
+        // Put all pieces into arrays for each team
+        let white_pieces: Piece[] = []
+        let black_pieces: Piece[] = []
+
+        for (let i = 0; i < this.state.length; i++) {
+            let piece = this.get_piece(i)
+            if (piece?.team === 'White') white_pieces.push(piece)
+            if (piece?.team === 'Black') black_pieces.push(piece)
+        }
+
+        // Remove shared pieces
+        let only_white: Piece[] = []
+        let only_black: Piece[] = []
+
+        // TODO: Get unique pieces for each team
+
+        // white_pieces.forEach(white_piece => {
+        //     let copy = false
+        //     black_pieces.forEach(black_piece => {
+        //         if (white_piece.type === black_piece.type) {
+        //             copy = true
+        //         }
+        //     })
+        //     if (copy === false) only_white.push(white_piece)
+        // })
+
+        // black_pieces.forEach(black_piece => {
+        //     let copy = false
+        //     white_pieces.forEach(white_piece => {
+        //         if (black_piece.type === white_piece.type) {
+        //             copy = true
+        //         }
+        //     })
+        //     if (copy === false) only_black.push(black_piece)
+        // })
+
+        // Return with data
+        return {
+            only_white,
+            only_black
+        }
     }
 }
