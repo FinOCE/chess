@@ -24,6 +24,6 @@ export default class Pawn extends Piece {
                 : this.team === 'White' ? [-16, -8] : [8, 16]
         )
             .map(move => i + move)
-            .filter(i => (i >= 0 && i < 64 && this.is_empty(state, i)))
+            .filter(i => (i >= 0 && i < 64 && this.is_legal(state, i)))
     }
 }
