@@ -18,13 +18,21 @@ export default class Pawn extends Piece {
     }
 
     public get_legal_moves(state: Array<Piece | null>, i: number): number[] {
-        return (
+        let moves = (
             this.has_moved
                 ? this.team === 'White' ? [-8] : [8]
-                : this.team === 'White' ? [-16, -8] : [8, 16]
+                : this.team === 'White' ? [-8, -16] : [8, 16]
         )
             .map(move => i + move)
-            .filter(i => (i >= 0 && i < 64 && this.is_legal(state, i)))
+        let legal = moves.filter(i => (i >= 0 && i < 64 && this.is_legal(state, i)))
+        
+        return 1 in legal
+            ? legal
+            : 0 in legal
+                ? legal[0] === moves[0]
+                    ? [moves[0]]
+                    : []
+                : []
     }
 
     public can_capture(state: Array<Piece | null>, i: number, target: number): boolean {
